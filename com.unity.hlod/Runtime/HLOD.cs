@@ -23,9 +23,10 @@ namespace Unity.HLODSystem
         private float m_MinObjectSize = 0.0f;
 
         private Type m_BatcherType;
-        
+
         private Type m_SimplifierType;
         private Type m_StreamingType;
+        private Type m_UserDataSerializerType;
 
 
         [SerializeField]
@@ -33,18 +34,19 @@ namespace Unity.HLODSystem
                                                 //< So, we should convert to string to store value.
         [SerializeField]
         private string m_SimplifierTypeStr;
-
         [SerializeField]
         private string m_StreamingTypeStr;
+        [SerializeField]
+        private string m_UserDataSerializerTypeStr;
 
-        
+
         [SerializeField]
         private SerializableDynamicObject m_SimplifierOptions = new SerializableDynamicObject();
         [SerializeField]
         private SerializableDynamicObject m_BatcherOptions = new SerializableDynamicObject();
         [SerializeField]
         private SerializableDynamicObject m_StreamingOptions = new SerializableDynamicObject();
-        
+
         [SerializeField]
         private List<Object> m_generatedObjects = new List<Object>();
         [SerializeField]
@@ -53,14 +55,14 @@ namespace Unity.HLODSystem
 
         public float ChunkSize
         {
-            get { return m_ChunkSize; }
             set { m_ChunkSize = value; }
+            get { return m_ChunkSize; }
         }
 
         public float LODDistance
         {
-            get { return m_LODDistance; }
             set { m_LODDistance = value; }
+            get { return m_LODDistance; }
         }
         public float CullDistance
         {
@@ -86,6 +88,12 @@ namespace Unity.HLODSystem
             get { return m_StreamingType; }
         }
 
+        public Type UserDataSerializerType
+        {
+            set { m_UserDataSerializerType = value; }
+            get { return m_UserDataSerializerType; }
+        }
+
         public SerializableDynamicObject BatcherOptions
         {
             get { return m_BatcherOptions; }
@@ -107,7 +115,7 @@ namespace Unity.HLODSystem
             get { return m_MinObjectSize; }
         }
 
-        
+
 #if UNITY_EDITOR
         public List<Object> GeneratedObjects
         {
@@ -146,21 +154,23 @@ namespace Unity.HLODSystem
 
             ret.center = bounds.center;
             float max = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
-            ret.size = new Vector3(max, max, max);  
+            ret.size = new Vector3(max, max, max);
 
             return ret;
         }
 
-    
+
 
         public void OnBeforeSerialize()
         {
-            if ( m_BatcherType != null )
+            if (m_BatcherType != null)
                 m_BatcherTypeStr = m_BatcherType.AssemblyQualifiedName;
             if (m_SimplifierType != null)
                 m_SimplifierTypeStr = m_SimplifierType.AssemblyQualifiedName;
             if (m_StreamingType != null)
                 m_StreamingTypeStr = m_StreamingType.AssemblyQualifiedName;
+            if (m_UserDataSerializerType != null)
+                m_UserDataSerializerTypeStr = m_UserDataSerializerType.AssemblyQualifiedName;
         }
 
         public void OnAfterDeserialize()
@@ -191,7 +201,16 @@ namespace Unity.HLODSystem
             {
                 m_StreamingType = Type.GetType(m_StreamingTypeStr);
             }
-            
+
+            if (string.IsNullOrEmpty(m_UserDataSerializerTypeStr))
+            {
+                m_UserDataSerializerType = null;
+            }
+            else
+            {
+                m_UserDataSerializerType = Type.GetType(m_UserDataSerializerTypeStr);
+            }
+
         }
 
         public void AddGeneratedResource(Object obj)

@@ -27,7 +27,7 @@ namespace Unity.HLODSystem.Utils
             {
                 if (objectList[i] == null)
                     continue;
-                if (objectList[i] is not T)
+                if (!(objectList[i] is T))
                     continue;
                 
                 if (objectList[i].name == name)

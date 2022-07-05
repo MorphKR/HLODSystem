@@ -26,7 +26,6 @@ namespace Unity.HLODSystem
         
         private Type m_SimplifierType;
         private Type m_StreamingType;
-        private Type m_UserDataSerializerType;
 
 
         [SerializeField]
@@ -34,10 +33,9 @@ namespace Unity.HLODSystem
                                                 //< So, we should convert to string to store value.
         [SerializeField]
         private string m_SimplifierTypeStr;
+
         [SerializeField]
         private string m_StreamingTypeStr;
-        [SerializeField]
-        private string m_UserDataSerializerTypeStr;
 
         
         [SerializeField]
@@ -56,11 +54,13 @@ namespace Unity.HLODSystem
         public float ChunkSize
         {
             get { return m_ChunkSize; }
+            set { m_ChunkSize = value; }
         }
 
         public float LODDistance
         {
             get { return m_LODDistance; }
+            set { m_LODDistance = value; }
         }
         public float CullDistance
         {
@@ -84,12 +84,6 @@ namespace Unity.HLODSystem
         {
             set { m_StreamingType = value; }
             get { return m_StreamingType; }
-        }
-
-        public Type UserDataSerializerType
-        {
-            set { m_UserDataSerializerType = value; }
-            get { return m_UserDataSerializerType; }
         }
 
         public SerializableDynamicObject BatcherOptions
@@ -167,8 +161,6 @@ namespace Unity.HLODSystem
                 m_SimplifierTypeStr = m_SimplifierType.AssemblyQualifiedName;
             if (m_StreamingType != null)
                 m_StreamingTypeStr = m_StreamingType.AssemblyQualifiedName;
-            if (m_UserDataSerializerType != null)
-                m_UserDataSerializerTypeStr = m_UserDataSerializerType.AssemblyQualifiedName;
         }
 
         public void OnAfterDeserialize()
@@ -198,15 +190,6 @@ namespace Unity.HLODSystem
             else
             {
                 m_StreamingType = Type.GetType(m_StreamingTypeStr);
-            }
-
-            if (string.IsNullOrEmpty(m_UserDataSerializerTypeStr))
-            {
-                m_UserDataSerializerType = null;
-            }
-            else
-            {
-                m_UserDataSerializerType = Type.GetType(m_UserDataSerializerTypeStr);
             }
             
         }

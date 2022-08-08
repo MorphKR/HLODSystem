@@ -502,11 +502,7 @@ namespace Unity.HLODSystem
                 }
                 else
                 {
-                    Debug.Log("MainAssetPath 1: " + mainAssetPath);
-
                     UnityEngine.Object[] objects = AssetDatabase.LoadAllAssetsAtPath(mainAssetPath);
-
-                    Debug.Log("MainAssetPath 2: " + mainAssetPath);
 
                     for (int oi = 0; oi < objects.Length; ++oi)
                     {

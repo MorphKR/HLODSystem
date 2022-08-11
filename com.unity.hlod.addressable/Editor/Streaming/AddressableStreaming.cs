@@ -409,6 +409,56 @@ namespace Unity.HLODSystem.Streaming
      
         
         static bool showFormat = true;
+
+        public static void Init(SerializableDynamicObject streamingOptions)
+        {
+            dynamic options = streamingOptions;
+
+            #region Setup default values
+
+            if (options.OutputDirectory == null)
+            {
+                string path = Application.dataPath;
+                path = "Assets" + path.Substring(Application.dataPath.Length);
+                path = path.Replace('\\', '/');
+                if (path.EndsWith("/") == false)
+                    path += "/";
+                options.OutputDirectory = path;
+            }
+
+            if (options.AddressablesGroupName == null)
+            {
+                options.AddressablesGroupName = "HLOD";
+            }
+
+            if (options.PCCompression == null)
+            {
+                options.PCCompression = TextureFormat.BC7;
+            }
+
+            if (options.WebGLCompression == null)
+            {
+                options.WebGLCompression = TextureFormat.DXT5;
+            }
+
+            if (options.AndroidCompression == null)
+            {
+                options.AndroidCompression = TextureFormat.ETC2_RGBA8;
+            }
+
+            if (options.iOSCompression == null)
+            {
+                options.iOSCompression = TextureFormat.PVRTC_RGBA4;
+            }
+
+            if (options.tvOSCompression == null)
+            {
+                options.tvOSCompression = TextureFormat.ASTC_4x4;
+            }
+
+            #endregion
+        }
+
         public static void OnGUI(SerializableDynamicObject streamingOptions)
         {
             dynamic options = streamingOptions;

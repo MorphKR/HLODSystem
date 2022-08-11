@@ -414,6 +414,97 @@ namespace Unity.HLODSystem
         private static string[] inputTexturePropertyNames = null;
         private static string[] outputTexturePropertyNames = null;
         private static TextureInfo addingTextureInfo = new TextureInfo();
+
+        public static void Init(HLOD hlod, bool isFirst)
+        {
+            if (isFirst)
+            {
+                inputTexturePropertyNames = null;
+                outputTexturePropertyNames = null;
+            }
+
+            EditorGUI.indentLevel += 1;
+            dynamic batcherOptions = hlod.BatcherOptions;
+
+            if (batcherOptions.PackTextureSize == null)
+                batcherOptions.PackTextureSize = 1024;
+            if (batcherOptions.LimitTextureSize == null)
+                batcherOptions.LimitTextureSize = 128;
+            if (batcherOptions.MaterialGUID == null)
+                batcherOptions.MaterialGUID = "";
+            if (batcherOptions.TextureInfoList == null)
+            {
+                batcherOptions.TextureInfoList = new List<TextureInfo>();
+                batcherOptions.TextureInfoList.Add(new TextureInfo()
+                {
+                    InputName = "_MainTex",
+                    OutputName = "_MainTex",
+                    Type = PackingType.White
+                });
+            }
+
+            if (batcherOptions.EnableTintColor == null)
+                batcherOptions.EnableTintColor = false;
+            if (batcherOptions.TintColorName == null)
+                batcherOptions.TintColorName = "";
+
+
+            Material mat = null;
+
+            string matGUID = batcherOptions.MaterialGUID;
+            string path = "";
+            if (string.IsNullOrEmpty(matGUID) == false)
+            {
+                path = AssetDatabase.GUIDToAssetPath(matGUID);
+                mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            }
+
+            if (mat == null)
+                mat = new Material(Shader.Find("Standard"));
+
+            path = AssetDatabase.GetAssetPath(mat);
+            matGUID = AssetDatabase.AssetPathToGUID(path);
+
+            if (matGUID != batcherOptions.MaterialGUID)
+            {
+                batcherOptions.MaterialGUID = matGUID;
+                outputTexturePropertyNames = mat.GetTexturePropertyNames();
+            }
+            if (inputTexturePropertyNames == null)
+            {
+                inputTexturePropertyNames = GetAllMaterialTextureProperties(hlod.gameObject);
+            }
+            if (outputTexturePropertyNames == null)
+            {
+                outputTexturePropertyNames = mat.GetTexturePropertyNames();
+            }
+
+            if (batcherOptions.EnableTintColor == true)
+            {
+                var shader = mat.shader;
+                List<string> colorPropertyNames = new List<string>();
+                int propertyCount = ShaderUtil.GetPropertyCount(shader);
+                for (int i = 0; i < propertyCount; ++i)
+                {
+                    string name = ShaderUtil.GetPropertyName(shader, i);
+                    if (ShaderUtil.GetPropertyType(shader, i) == ShaderUtil.ShaderPropertyType.Color)
+                    {
+                        colorPropertyNames.Add(name);
+                    }
+                }
+
+                int index = colorPropertyNames.IndexOf(batcherOptions.TintColorName);
+                if (index >= 0)
+                {
+                    batcherOptions.TintColorName = colorPropertyNames[index];
+                }
+                else
+                {
+                    batcherOptions.TintColorName = "";
+                }
+            }
+        }
+
         public static void OnGUI(HLOD hlod, bool isFirst)
         {
             if (isFirst )

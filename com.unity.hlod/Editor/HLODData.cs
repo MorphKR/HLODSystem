@@ -503,6 +503,7 @@ namespace Unity.HLODSystem
                 else
                 {
                     UnityEngine.Object[] objects = AssetDatabase.LoadAllAssetsAtPath(mainAssetPath);
+
                     for (int oi = 0; oi < objects.Length; ++oi)
                     {
                         if (objects[oi].name == subAssetName)

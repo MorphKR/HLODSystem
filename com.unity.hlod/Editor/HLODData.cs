@@ -502,7 +502,7 @@ namespace Unity.HLODSystem
                 }
                 else
                 {
-                    UnityEngine.Object[] objects = AssetDatabase.LoadAllAssetsAtPath(mainAssetPath);
+                    UnityEngine.Object[] objects = AssetDatabase.LoadAllAssetRepresentationsAtPath(mainAssetPath);
 
                     for (int oi = 0; oi < objects.Length; ++oi)
                     {

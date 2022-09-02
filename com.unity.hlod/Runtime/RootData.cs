@@ -14,6 +14,12 @@ namespace Unity.HLODSystem
 
         public void SetRootObject(string name, GameObject gameObject)
         {
+            if (name == string.Empty)
+            {
+                name = "_0";
+                gameObject.name = "_0";
+            }
+
             if (m_rootObjects.ContainsKey(name) == false)
             {
                 m_rootObjects.Add(name, gameObject);

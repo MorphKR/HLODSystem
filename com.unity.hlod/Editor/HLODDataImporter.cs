@@ -96,6 +96,10 @@ namespace Unity.HLODSystem
                             List<string> materialNames = so.GetMaterialNames();
                             List<Material> materials = new List<Material>();
 
+                            mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                            mr.receiveShadows = false;
+                            mr.allowOcclusionWhenDynamic = false;
+
                             for (int mi = 0; mi < materialIds.Count; ++mi)
                             {
                                 string id = materialIds[mi];

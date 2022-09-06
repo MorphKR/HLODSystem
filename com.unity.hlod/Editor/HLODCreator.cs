@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -85,7 +85,7 @@ namespace Unity.HLODSystem
                 Node = root,
                 Parent = -1,
                 Level = 0,
-                Name = "",
+                Name = "0",
                 TargetGameObjects = new List<GameObject>(),
                 Distances = new List<int>(),
                 

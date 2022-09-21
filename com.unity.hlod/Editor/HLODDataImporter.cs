@@ -130,7 +130,7 @@ namespace Unity.HLODSystem
                             Mesh mesh = so.GetMesh().To();
                             mf.sharedMesh = mesh;
                             mr.sharedMaterials = materials.ToArray();
-                            mr.lightProbeUsage = so.LightProbeUsage;
+                            //mr.lightProbeUsage = so.LightProbeUsage;
 
                             ctx.AddObjectToAsset(mesh.name, mesh);
 

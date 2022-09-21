@@ -99,6 +99,8 @@ namespace Unity.HLODSystem
                             mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                             mr.receiveShadows = false;
                             mr.allowOcclusionWhenDynamic = false;
+                            mr.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
+                            mr.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
                             for (int mi = 0; mi < materialIds.Count; ++mi)
                             {

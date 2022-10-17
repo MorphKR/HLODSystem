@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
@@ -32,6 +32,18 @@ namespace Unity.HLODSystem
                 return nmt;
             }
 
+            public List<string> GetTextureNameList()
+            {
+                List<string> textureNameList = new List<string>();
+
+                for(int i = 0; i < m_textures.Count; i++)
+                {
+                    textureNameList.Add(m_textures[i].Name);
+                }
+
+                return textureNameList;
+            }
+
 
             public int Count => m_textures.Count;
 
@@ -56,17 +68,23 @@ namespace Unity.HLODSystem
             private List<object> m_objects;
             private List<Rect> m_uvs;
             private List<Guid> m_guids;
+            private List<string> m_names;
+
             private DisposableList<WorkingTexture> m_textures;
 
             public List<object> Objects => m_objects;
             public List<Rect> UVs => m_uvs;
+
+            public List<string> TextureNames => m_names;
+
             public DisposableList<WorkingTexture> Textures => m_textures;
 
-            protected TextureAtlas(List<object> objs, List<Rect> uvs, List<Guid> guids)
+            protected TextureAtlas(List<object> objs, List<Rect> uvs, List<Guid> guids, List<string> textureNames)
             {
                 m_objects = objs;
                 m_uvs = uvs;
                 m_guids = guids;
+                m_names = textureNames;
                 m_textures = new DisposableList<WorkingTexture>();
             }
             public bool Contains(object obj)
@@ -74,11 +92,17 @@ namespace Unity.HLODSystem
                 return m_objects.Contains(obj);
             }
 
-            public Rect GetUV(Guid textureGuid)
+            public Rect GetUV(string textureName)
             {
-                int index = m_guids.IndexOf(textureGuid);
+                int index = m_names.IndexOf(textureName); //m_guids.IndexOf(textureGuid);
+
+                if (index == -1)
+                    Debug.Log("TextureName : " + textureName);
+                //    return Rect.zero;
+
                 return m_uvs[index];
             }
+
             public void Dispose()
             {
                 m_textures.Dispose();
@@ -88,8 +112,8 @@ namespace Unity.HLODSystem
 
         class TextureAtlasCreator : TextureAtlas
         {
-            public TextureAtlasCreator(List<object> objs, List<Rect> uvs, List<Guid> guids, DisposableList<TextureCombiner> combiners)
-                : base(objs, uvs, guids) 
+            public TextureAtlasCreator(List<object> objs, List<Rect> uvs, List<Guid> guids, List<string> textureNames, DisposableList<TextureCombiner> combiners)
+                : base(objs, uvs, guids, textureNames) 
             {
                 for (int i = 0; i < combiners.Count; ++i)
                 {
@@ -138,37 +162,47 @@ namespace Unity.HLODSystem
             
             public static Score GetScore(Source lhs, Source rhs)
             {
-                int match = lhs.m_textureGuids.Intersect(rhs.m_textureGuids).Count();
+                //int match = lhs.m_textureGuids.Intersect(rhs.m_textureGuids).Count();
+                int match = lhs.m_textureNames.Intersect(rhs.m_textureNames).Count();
+
                 return new Score()
                 {
                     Lhs = lhs,
                     Rhs = rhs,
+
+
                     MatchCount = match
                 };
             }
 
             public static Source Combine(Source lhs, Source rhs)
             {
-                Source newSource = new Source();
+                Source newSource = new Source(); //소스
                 newSource.m_obj = new List<object>();
-                newSource.m_obj.AddRange(lhs.m_obj);
-                newSource.m_obj.AddRange(rhs.m_obj);
+                newSource.m_obj.AddRange(lhs.m_obj); //소스1 new Source에 추가
+                newSource.m_obj.AddRange(rhs.m_obj); //소스2 new Source에 추가
 
-                newSource.m_textures = new DisposableList<MaterialTexture>();
+                newSource.m_textures = new DisposableList<MaterialTexture>(); //
                 newSource.m_textureGuids = new List<Guid>();
+                newSource.m_textureNames = new List<string>();
 
                 for (int i = 0; i < lhs.m_textures.Count; ++i)
                 {
                     newSource.m_textures.Add(lhs.m_textures[i].Clone());
                     newSource.m_textureGuids.Add(lhs.m_textureGuids[i]);
+                    newSource.m_textureNames.Add(lhs.m_textureNames[i]);
                 }
                 
                 for (int i = 0; i < rhs.m_textures.Count; ++i)
                 {
                     if (newSource.m_textureGuids.Contains(rhs.m_textureGuids[i]) == false)
                     {
-                        newSource.m_textures.Add(rhs.m_textures[i].Clone());
-                        newSource.m_textureGuids.Add(rhs.m_textureGuids[i]);
+                        if (newSource.m_textureNames.Contains(rhs.m_textureNames[i]) == false)
+                        {
+                            newSource.m_textures.Add(rhs.m_textures[i].Clone());
+                            newSource.m_textureGuids.Add(rhs.m_textureGuids[i]);
+                            newSource.m_textureNames.Add(rhs.m_textureNames[i]);
+                        }
                     }
                 }
 
@@ -182,7 +216,10 @@ namespace Unity.HLODSystem
                 {
                     if (lhs.m_textureGuids.Contains(rhs.m_textureGuids[i]) == false)
                     {
-                        count += 1;
+                        if(lhs.m_textureNames.Contains(rhs.m_textureNames[i]) == false)
+                        {
+                            count += 1;
+                        }
                     }
                 }
 
@@ -191,6 +228,7 @@ namespace Unity.HLODSystem
 
             private List<object> m_obj;
             private List<Guid> m_textureGuids;
+            private List<string> m_textureNames;
             private DisposableList<MaterialTexture> m_textures;
 
 
@@ -207,10 +245,12 @@ namespace Unity.HLODSystem
                 
                 m_textures = textures;
                 m_textureGuids = new List<Guid>(textures.Count);
+                m_textureNames = new List<string>(textures.Count);
 
                 for (int i = 0; i < textures.Count; ++i)
                 {
                     m_textureGuids.Add(textures[i][0].GetGUID());
+                    m_textureNames.Add(textures[i][0].Name);
                 }
             }
             public void Dispose()
@@ -226,6 +266,8 @@ namespace Unity.HLODSystem
                 ns.m_obj.AddRange(m_obj);
                 ns.m_textureGuids = new List<Guid>();
                 ns.m_textureGuids.AddRange(m_textureGuids);
+                ns.m_textureNames = new List<string>();
+                ns.m_textureNames.AddRange(m_textureNames);
                 ns.m_textures = new DisposableList<MaterialTexture>();
                 for (int i = 0; i < m_textures.Count; ++i)
                 {
@@ -264,6 +306,8 @@ namespace Unity.HLODSystem
                 {
                     List<Rect> uvs = new List<Rect>(resizedTextures.Count);
                     List<Guid> guids = new List<Guid>(resizedTextures.Count);
+                    List<string> names = new List<string>(resizedTextures.Count);
+
                     for (int i = 0; i < resizedTextures.Count; ++i)
                     {
                         int x = i % itemCount;
@@ -281,13 +325,15 @@ namespace Unity.HLODSystem
 
                         guids.Add(m_textures[i][0].GetGUID());
 
+                        names.Add(m_textures[i][0].Name);
+
                         for (int k = 0; k < resizedTextures[i].Count; ++k)
                         {
                             combiners[k].SetTexture(resizedTextures[i][k], x * itemSize, y * itemSize);
                         }
                     }
 
-                    atlas = new TextureAtlasCreator(m_obj, uvs, guids, combiners);
+                    atlas = new TextureAtlasCreator(m_obj, uvs, guids, names, combiners);
                 }
 
                 return atlas;
@@ -446,6 +492,8 @@ namespace Unity.HLODSystem
                 for (int i = 0; i < m_sources.Count; ++i)
                 {
                     int maxCount = m_sources[i].GetMaxTextureCount(packTextureSize, maxSourceSize);
+
+                    Debug.Log("MaxCount : " + maxCount);
                     if (taskGroups.ContainsKey(maxCount) == false)
                         taskGroups.Add(maxCount, new TaskGroup(format, packTextureSize, linear, maxCount));
 

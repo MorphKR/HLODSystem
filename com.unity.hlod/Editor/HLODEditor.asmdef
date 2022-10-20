@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "HLOD",
-        "UnityMeshSimplifier"
+        "UnityMeshSimplifier",
+        "OpenWorldSDK"
     ],
     "includePlatforms": [
         "Editor"

@@ -460,7 +460,7 @@ namespace Unity.HLODSystem
         private static string[] outputTexturePropertyNames = null;
         private static TextureInfo addingTextureInfo = new TextureInfo();
 
-        public static void Init(HLOD hlod, bool isFirst)
+        public static void Init(HLOD hlod, OpenWorldSDK.HlodMeta hlodMeta, bool isFirst)
         {
             if (isFirst)
             {
@@ -469,23 +469,28 @@ namespace Unity.HLODSystem
             }
 
             EditorGUI.indentLevel += 1;
+
             dynamic batcherOptions = hlod.BatcherOptions;
 
             if (batcherOptions.PackTextureSize == null)
-                batcherOptions.PackTextureSize = 1024;
+                batcherOptions.PackTextureSize = hlodMeta.packTextureSize;
             if (batcherOptions.LimitTextureSize == null)
-                batcherOptions.LimitTextureSize = 128;
+                batcherOptions.LimitTextureSize = hlodMeta.limitTextureSize;
             if (batcherOptions.MaterialGUID == null)
                 batcherOptions.MaterialGUID = "";
             if (batcherOptions.TextureInfoList == null)
             {
                 batcherOptions.TextureInfoList = new List<TextureInfo>();
-                batcherOptions.TextureInfoList.Add(new TextureInfo()
+
+                for (int i = 0; i < hlodMeta.textureInfoMetaList.Count; i++)
                 {
-                    InputName = "_MainTex",
-                    OutputName = "_MainTex",
-                    Type = PackingType.White
-                });
+                    batcherOptions.TextureInfoList.Add(new TextureInfo()
+                    {
+                        InputName = hlodMeta.textureInfoMetaList[i].InputName,
+                        OutputName = hlodMeta.textureInfoMetaList[i].OutputName,
+                        Type = OpenWorldSDK.EnumUtil<PackingType>.Parse(hlodMeta.textureInfoMetaList[i].Type)
+                    });
+                }
             }
 
             if (batcherOptions.EnableTintColor == null)

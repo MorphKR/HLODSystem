@@ -1,6 +1,6 @@
 [submodule "com.unity.hlod/Package/UnityMeshSimplifier"]
 	path = com.unity.hlod/Package/UnityMeshSimplifier
 	url = https://github.com/Unity-Technologies/UnityMeshSimplifier.git
-[submodule "UGMeshSimplify"]
-	path = UGMeshSimplify
+[submodule "com.unity.hlod/Package/UGMeshSimplify"]
+	path = com.unity.hlod/Package/UGMeshSimplify
 	url = https://github.com/MorphKR/UGMeshSimplify.git

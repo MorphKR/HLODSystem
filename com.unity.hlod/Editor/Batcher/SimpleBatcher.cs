@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
@@ -10,6 +10,9 @@ namespace Unity.HLODSystem
 {
     public class SimpleBatcher : IBatcher
     {
+        /// <summary>
+        /// 패킹 타입
+        /// </summary>
         public enum PackingType
         {
             White,
@@ -17,17 +20,29 @@ namespace Unity.HLODSystem
             Normal,
         }
 
+
+        /// <summary>
+        /// 배처 옵션 타입을 등록?
+        /// </summary>
         [InitializeOnLoadMethod]
         static void RegisterType()
         {
             BatcherTypes.RegisterBatcherType(typeof(SimpleBatcher));
         }
 
+
         private DisposableDictionary<TexturePacker.TextureAtlas, WorkingMaterial> m_createdMaterials = new DisposableDictionary<TexturePacker.TextureAtlas, WorkingMaterial>();
+
+        /// <summary>
+        /// 선택된 Batcher 옵션
+        /// </summary>
         private SerializableDynamicObject m_batcherOptions;
         
         
 
+        /// <summary>
+        /// 텍스처 정보
+        /// </summary>
         [Serializable]
         public class TextureInfo
         {
@@ -184,6 +199,13 @@ namespace Unity.HLODSystem
 
         }
 
+        /// <summary>
+        /// 텍스처 패킹 하는 함수, 
+        /// </summary>
+        /// <param name="packer"></param>
+        /// <param name="targets"></param>
+        /// <param name="options"></param>
+        /// <param name="onProgress"></param>
         private void PackingTexture(TexturePacker packer, DisposableList<HLODBuildInfo> targets, dynamic options, Action<float> onProgress)
         { 
             List<TextureInfo> textureInfoList = options.TextureInfoList;
@@ -194,6 +216,8 @@ namespace Unity.HLODSystem
                     var workingObjects = targets[i].WorkingObjects;
                     Dictionary<Guid, TexturePacker.MaterialTexture> textures =
                         new Dictionary<Guid, TexturePacker.MaterialTexture>();
+
+                    List<string> texturesNameList = new List<string>();
 
                     for (int oi = 0; oi < workingObjects.Count; ++oi)
                     {
@@ -208,11 +232,15 @@ namespace Unity.HLODSystem
                             if (textures.ContainsKey(materialTextures[0].GetGUID()) == true)
                                 continue;
 
+                            if (texturesNameList.Contains(materialTextures[0].Name))
+                                continue;
+
                             textures.Add(materialTextures[0].GetGUID(), materialTextures);
+                            texturesNameList.Add(materialTextures[0].Name);
                         }
                     }
 
-
+                        
                     packer.AddTextureGroup(targets[i], textures.Values.ToList());
 
 
@@ -274,6 +302,13 @@ namespace Unity.HLODSystem
             return material;
         }
 
+        /// <summary>
+        /// 매쉬 변환, 
+        /// </summary>
+        /// <param name="rootPosition"></param>
+        /// <param name="packer"></param>
+        /// <param name="info"></param>
+        /// <param name="options"></param>
         private void Combine(Vector3 rootPosition, TexturePacker packer, HLODBuildInfo info, dynamic options)
         {
             var atlas = packer.GetAtlas(info);
@@ -313,6 +348,7 @@ namespace Unity.HLODSystem
             WorkingMaterial newMat = m_createdMaterials[atlas].Clone();
 
             combinedMesh.name = info.Name + "_Mesh";
+
             newObj.Name = info.Name;
             newObj.SetMesh(combinedMesh);
             newObj.Materials.Add(newMat);
@@ -338,6 +374,7 @@ namespace Unity.HLODSystem
                     {
                         var uvCoord = uv[i];
                         var texture = materials[mi].GetTexture(mainTextureName);
+
                         
                         if (texture == null || texture.GetGUID() == Guid.Empty)
                         {
@@ -347,7 +384,7 @@ namespace Unity.HLODSystem
                         }
                         else
                         {
-                            var uvOffset = atlas.GetUV(texture.GetGUID());
+                            var uvOffset = atlas.GetUV(texture.Name);
                             
                             uvCoord.x = Mathf.Lerp(uvOffset.xMin, uvOffset.xMax, uvCoord.x);
                             uvCoord.y = Mathf.Lerp(uvOffset.yMin, uvOffset.yMax, uvCoord.y);
@@ -365,6 +402,14 @@ namespace Unity.HLODSystem
 
 
      
+        /// <summary>
+        /// 빈 텍스처를 만들어주는 함수
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="color"></param>
+        /// <param name="linear"></param>
+        /// <returns></returns>
         static private WorkingTexture CreateEmptyTexture(int width, int height, Color color, bool linear)
         {
             WorkingTexture texture = new WorkingTexture(Allocator.Persistent, TextureFormat.RGB24, width, height, linear);
@@ -415,7 +460,7 @@ namespace Unity.HLODSystem
         private static string[] outputTexturePropertyNames = null;
         private static TextureInfo addingTextureInfo = new TextureInfo();
 
-        public static void Init(HLOD hlod, bool isFirst)
+        public static void Init(HLOD hlod, OpenWorldSDK.HlodMeta hlodMeta, bool isFirst)
         {
             if (isFirst)
             {
@@ -424,23 +469,28 @@ namespace Unity.HLODSystem
             }
 
             EditorGUI.indentLevel += 1;
+
             dynamic batcherOptions = hlod.BatcherOptions;
 
             if (batcherOptions.PackTextureSize == null)
-                batcherOptions.PackTextureSize = 1024;
+                batcherOptions.PackTextureSize = hlodMeta.packTextureSize;
             if (batcherOptions.LimitTextureSize == null)
-                batcherOptions.LimitTextureSize = 128;
+                batcherOptions.LimitTextureSize = hlodMeta.limitTextureSize;
             if (batcherOptions.MaterialGUID == null)
                 batcherOptions.MaterialGUID = "";
             if (batcherOptions.TextureInfoList == null)
             {
                 batcherOptions.TextureInfoList = new List<TextureInfo>();
-                batcherOptions.TextureInfoList.Add(new TextureInfo()
+
+                for (int i = 0; i < hlodMeta.textureInfoMetaList.Count; i++)
                 {
-                    InputName = "_MainTex",
-                    OutputName = "_MainTex",
-                    Type = PackingType.White
-                });
+                    batcherOptions.TextureInfoList.Add(new TextureInfo()
+                    {
+                        InputName = hlodMeta.textureInfoMetaList[i].InputName,
+                        OutputName = hlodMeta.textureInfoMetaList[i].OutputName,
+                        Type = OpenWorldSDK.EnumUtil<PackingType>.Parse(hlodMeta.textureInfoMetaList[i].Type)
+                    });
+                }
             }
 
             if (batcherOptions.EnableTintColor == null)

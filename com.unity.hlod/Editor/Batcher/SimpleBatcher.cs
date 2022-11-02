@@ -460,7 +460,7 @@ namespace Unity.HLODSystem
         private static string[] outputTexturePropertyNames = null;
         private static TextureInfo addingTextureInfo = new TextureInfo();
 
-        public static void Init(HLOD hlod, OpenWorldSDK.HlodMeta hlodMeta, bool isFirst)
+        public static void Init(HLOD hlod, MegaWorldSDK.HlodMeta hlodMeta, bool isFirst)
         {
             if (isFirst)
             {
@@ -488,7 +488,7 @@ namespace Unity.HLODSystem
                     {
                         InputName = hlodMeta.textureInfoMetaList[i].InputName,
                         OutputName = hlodMeta.textureInfoMetaList[i].OutputName,
-                        Type = OpenWorldSDK.EnumUtil<PackingType>.Parse(hlodMeta.textureInfoMetaList[i].Type)
+                        Type = MegaWorldSDK.EnumUtil<PackingType>.Parse(hlodMeta.textureInfoMetaList[i].Type)
                     });
                 }
             }

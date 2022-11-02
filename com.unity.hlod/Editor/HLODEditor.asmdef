@@ -4,7 +4,8 @@
     "references": [
         "HLOD",
         "UnityMeshSimplifier",
-        "OpenWorldSDK"
+        "MegaWorldSDK",
+        "UgToolsMeshSimplify"
     ],
     "includePlatforms": [
         "Editor"

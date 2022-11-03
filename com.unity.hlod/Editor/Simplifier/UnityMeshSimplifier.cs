@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using Unity.Collections;
 using Unity.HLODSystem.Utils;
@@ -50,6 +50,7 @@ namespace Unity.HLODSystem.Simplifier
 
             Utils.WorkingMesh nwm = new WorkingMesh(Allocator.Persistent, meshSimplifier.Vertices.Length, triCount, meshSimplifier.SubMeshCount, 0);
             nwm.name = origin.name;
+
             nwm.vertices = meshSimplifier.Vertices;
             nwm.normals = meshSimplifier.Normals;
             nwm.tangents = meshSimplifier.Tangents;

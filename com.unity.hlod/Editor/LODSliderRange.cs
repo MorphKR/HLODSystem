@@ -49,7 +49,7 @@ namespace Unity.HLODSystem
         {
             
             float pos = sliderArea.width * (1.0f - Mathf.Sqrt(EndPosition));
-            return new Rect(sliderArea.x + pos - 5.0f, sliderArea.y, 10.0f, sliderArea.height );
+            return new Rect(sliderArea.x + pos - 0.0f, sliderArea.y, 10.0f, sliderArea.height );
         }
         public void Draw(Rect sliderArea, Color color, float startPosition)
         {

@@ -52,7 +52,7 @@ namespace Unity.HLODSystem
 
         private bool isFirstOnGUI = true;
         
-        private ISpaceSplitter m_splitter = new QuadTreeSpaceSplitter(5.0f);
+        private ISpaceSplitter m_splitter = new QuadTreeSpaceSplitter(0.0f);
 
         [InitializeOnLoadMethod]
         static void InitTagTagUtils()

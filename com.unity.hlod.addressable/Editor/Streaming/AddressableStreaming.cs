@@ -228,18 +228,18 @@ namespace Unity.HLODSystem.Streaming
                     
                     if (address != null)
                     {
-                        //List<PropCustomProperty> propCustomPropertyList = new List<PropCustomProperty>();
-                        //
-                        //
-                        //BaseProperty[] baseProperties = spaceNode.Objects[oi].GetComponentsInChildren<BaseProperty>();
-                        //
-                        //foreach(var property in baseProperties)
-                        //{
-                        //    propCustomPropertyList.AddRange(property.GetMetaData());
-                        //}
-                        //
-                        //highId = addressableController.AddHighObject(address, spaceNode.Objects[oi], propCustomPropertyList);
-                        highId = addressableController.AddHighObject(address, spaceNode.Objects[oi]);
+                        List<PropCustomProperty> propCustomPropertyList = new List<PropCustomProperty>();
+                        
+                        
+                        BaseProperty[] baseProperties = spaceNode.Objects[oi].GetComponentsInChildren<BaseProperty>();
+                        
+                        foreach(var property in baseProperties)
+                        {
+                            propCustomPropertyList.AddRange(property.GetMetaData());
+                        }
+                        
+                        highId = addressableController.AddHighObject(address, spaceNode.Objects[oi], propCustomPropertyList);
+                        //highId = addressableController.AddHighObject(address, spaceNode.Objects[oi]);
                     }
                     else
                     {

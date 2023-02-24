@@ -26,6 +26,7 @@ namespace Unity.HLODSystem
             int UV2Count = 0;
             int UV3Count = 0;
             int UV4Count = 0;
+            int UV5Count = 0;
             int colorCount = 0;
 
             int trianglesCount = 0;
@@ -44,6 +45,7 @@ namespace Unity.HLODSystem
                 UV2Count += (infos[i].Mesh.uv2.Length > 0) ? remapper.Count : 0;
                 UV3Count += (infos[i].Mesh.uv3.Length > 0) ? remapper.Count : 0;
                 UV4Count += (infos[i].Mesh.uv4.Length > 0) ? remapper.Count : 0;
+                UV5Count += (infos[i].Mesh.uv5.Length > 0) ? remapper.Count : 0;
                 colorCount += (infos[i].Mesh.colors.Length > 0) ? remapper.Count : 0;
 
                 trianglesCount += meshIndices.Length;
@@ -60,6 +62,7 @@ namespace Unity.HLODSystem
             List<Vector2> uv2s = new List<Vector2>(verticesCount);
             List<Vector2> uv3s = new List<Vector2>(verticesCount);
             List<Vector2> uv4s = new List<Vector2>(verticesCount);
+            List<Vector2> uv5s = new List<Vector2>(verticesCount);
             List<Color> colors = new List<Color>(colorCount);
             
             List<int> triangles = new List<int>(trianglesCount);
@@ -108,6 +111,8 @@ namespace Unity.HLODSystem
                     FillBuffer(ref uv3s, mesh.uv3, remapper, Vector2.zero);
                 if ( UV4Count > 0 )
                     FillBuffer(ref uv4s, mesh.uv4, remapper, Vector2.zero);
+                if ( UV5Count > 0)
+                    FillBuffer(ref uv5s, mesh.uv5, remapper, Vector2.zero);
                 if ( colorCount > 0 )
                     FillBuffer(ref colors, mesh.colors, remapper, Color.white);
 
@@ -123,6 +128,7 @@ namespace Unity.HLODSystem
             combinedMesh.uv2 = uv2s.ToArray();
             combinedMesh.uv3 = uv3s.ToArray();
             combinedMesh.uv4 = uv4s.ToArray();
+            combinedMesh.uv5 = uv5s.ToArray();
             combinedMesh.colors = colors.ToArray();
             
             combinedMesh.SetTriangles(triangles.ToArray(), 0);

@@ -34,6 +34,7 @@ namespace Unity.HLODSystem
             [SerializeField] private byte[] m_uvs2;
             [SerializeField] private byte[] m_uvs3;
             [SerializeField] private byte[] m_uvs4;
+            [SerializeField] private byte[] m_uvs5;
             [SerializeField] private byte[] m_colors;
             [SerializeField] private List<int[]> m_indices;
 
@@ -90,6 +91,7 @@ namespace Unity.HLODSystem
                 m_uvs2 = ArrayToBytes(mesh.uv2);
                 m_uvs3 = ArrayToBytes(mesh.uv3);
                 m_uvs4 = ArrayToBytes(mesh.uv4);
+                m_uvs5 = ArrayToBytes(mesh.uv5);
                 m_colors = ArrayToBytes(mesh.colors);
                 m_indices = new List<int[]>();
                 for (int i = 0; i < mesh.subMeshCount; ++i)
@@ -112,6 +114,7 @@ namespace Unity.HLODSystem
                 mesh.uv2 = BytesToArray<Vector2>(m_uvs2);
                 mesh.uv3 = BytesToArray<Vector2>(m_uvs3);
                 mesh.uv4 = BytesToArray<Vector2>(m_uvs4);
+                mesh.uv5 = BytesToArray<Vector2>(m_uvs5);
                 mesh.colors = BytesToArray<Color>(m_colors);
 
                 mesh.subMeshCount = m_indices.Count;
@@ -133,6 +136,7 @@ namespace Unity.HLODSystem
                 usage += m_uvs2.Length;
                 usage += m_uvs3.Length;
                 usage += m_uvs4.Length;
+                usage += m_uvs5.Length;
                 usage += m_colors.Length;
                 for ( int i = 0; i < m_indices.Count; ++i )
                 {

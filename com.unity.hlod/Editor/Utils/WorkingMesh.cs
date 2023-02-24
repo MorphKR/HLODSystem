@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using Unity.Collections;
@@ -30,6 +30,7 @@ namespace Unity.HLODSystem.Utils
             wm.uv2 = mesh.uv2;
             wm.uv3 = mesh.uv3;
             wm.uv4 = mesh.uv4;
+            wm.uv5 = mesh.uv5;
             wm.colors = mesh.colors;
             wm.boneWeights = mesh.boneWeights;
             wm.bindposes = bindposes ?? mesh.bindposes;
@@ -56,6 +57,7 @@ namespace Unity.HLODSystem.Utils
             UV2,
             UV3,
             UV4,
+            UV5,
             Colors,
             BoneWeights,
             Bindposes,
@@ -245,6 +247,30 @@ namespace Unity.HLODSystem.Utils
         {
             get { return m_Counts[(int)Channel.UV4]; }
             set { m_Counts[(int)Channel.UV4] = value; }
+        }
+
+        public Vector2[] uv5
+        {
+            get { return m_UV5.Slice(0, uv5Count).ToArray(); }
+            set
+            {
+                if (value == null || value.Length == 0)
+                {
+                    uv5Count = 0;
+                }
+                else
+                {
+                    uv5Count = value.Length;
+                    m_UV5.Slice(0, uv5Count).CopyFrom(value);
+                }
+            }
+        }
+        NativeArray<Vector2> m_UV5;
+
+        int uv5Count
+        {
+            get { return m_Counts[(int)Channel.UV5]; }
+            set { m_Counts[(int)Channel.UV5] = value; }
         }
 
         public Color[] colors
@@ -469,6 +495,7 @@ namespace Unity.HLODSystem.Utils
             m_UV2 = new NativeArray<Vector2>(maxVertices, allocator);
             m_UV3 = new NativeArray<Vector2>(maxVertices, allocator);
             m_UV4 = new NativeArray<Vector2>(maxVertices, allocator);
+            m_UV5 = new NativeArray<Vector2>(maxVertices, allocator);
             m_Colors = new NativeArray<Color>(maxVertices, allocator);
             m_BoneWeights = new NativeArray<BoneWeight>(maxVertices, allocator);
             m_Bindposes = new NativeArray<Matrix4x4>(maxBindposes, allocator);
@@ -502,6 +529,9 @@ namespace Unity.HLODSystem.Utils
 
             if (m_UV4.IsCreated)
                 m_UV4.Dispose();
+
+            if (m_UV5.IsCreated)
+                m_UV5.Dispose();
 
             if (m_Colors.IsCreated)
                 m_Colors.Dispose();
@@ -544,6 +574,7 @@ namespace Unity.HLODSystem.Utils
             mesh.uv2 = uv2;
             mesh.uv3 = uv3;
             mesh.uv4 = uv4;
+            mesh.uv5 = uv5;
             mesh.colors = colors;
             mesh.boneWeights = boneWeights;
             mesh.bindposes = bindposes;

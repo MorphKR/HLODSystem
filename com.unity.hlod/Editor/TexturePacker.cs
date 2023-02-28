@@ -493,7 +493,6 @@ namespace Unity.HLODSystem
                 {
                     int maxCount = m_sources[i].GetMaxTextureCount(packTextureSize, maxSourceSize);
 
-                    Debug.Log("MaxCount : " + maxCount);
                     if (taskGroups.ContainsKey(maxCount) == false)
                         taskGroups.Add(maxCount, new TaskGroup(format, packTextureSize, linear, maxCount));
 

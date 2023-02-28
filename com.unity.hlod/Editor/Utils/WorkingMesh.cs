@@ -273,6 +273,47 @@ namespace Unity.HLODSystem.Utils
             set { m_Counts[(int)Channel.UV5] = value; }
         }
 
+        public Vector2[] GetUVByChannel(int channel)
+        {
+            switch (channel)
+            {
+                case 0:
+                    return uv;
+                case 1:
+                    return uv2;
+                case 2:
+                    return uv3;
+                case 3:
+                    return uv4;
+                case 4:
+                    return uv5;
+            }
+
+            return null;
+        }
+
+        public void SetUVByChannel(int channel, Vector2[] setUV)
+        {
+            switch (channel)
+            {
+                case 0:
+                    uv = setUV;
+                    break;
+                case 1:
+                    uv2 = setUV;
+                    break;
+                case 2:
+                    uv3 = setUV;
+                    break;
+                case 3:
+                    uv4 = setUV;
+                    break;
+                case 4:
+                    uv5 = setUV;
+                    break;
+            }
+        }
+
         public Color[] colors
         {
             get { return m_Colors.Slice(0, colorsCount).ToArray(); }

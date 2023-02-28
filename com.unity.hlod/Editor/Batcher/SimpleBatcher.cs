@@ -361,43 +361,57 @@ namespace Unity.HLODSystem
 
         private void ConvertMesh(WorkingMesh mesh, DisposableList<WorkingMaterial> materials, TexturePacker.TextureAtlas atlas, string mainTextureName)
         {
-            var uv = mesh.uv;
-            var updated = new bool[uv.Length];
-            // Some meshes have submeshes that either aren't expected to render or are missing a material, so go ahead and skip
-            int subMeshCount = Mathf.Min(mesh.subMeshCount, materials.Count);
-            for (int mi = 0; mi < subMeshCount; ++mi)
-            {
-                int[] indices = mesh.GetTriangles(mi);
-                foreach (var i in indices)
-                {
-                    if ( updated[i] == false )
-                    {
-                        var uvCoord = uv[i];
-                        var texture = materials[mi].GetTexture(mainTextureName);
+            Vector2[] uv = null;
 
-                        
-                        if (texture == null || texture.GetGUID() == Guid.Empty)
+            for (int uvChannel = 0; uvChannel < 5; uvChannel++)
+            {
+                uv = mesh.GetUVByChannel(uvChannel);
+
+                if (uv.Length == 0)
+                    continue;
+
+
+                var updated = new bool[uv.Length];
+                // Some meshes have submeshes that either aren't expected to render or are missing a material, so go ahead and skip
+                int subMeshCount = Mathf.Min(mesh.subMeshCount, materials.Count);
+                for (int mi = 0; mi < subMeshCount; ++mi)
+                {
+                    int[] indices = mesh.GetTriangles(mi);
+                    foreach (var i in indices)
+                    {
+                        if (updated[i] == false)
                         {
-                            // Sample at center of white texture to avoid sampling edge colors incorrectly
-                            uvCoord.x = 0.5f;
-                            uvCoord.y = 0.5f;
+                            var uvCoord = uv[i];
+                            var texture = materials[mi].GetTexture(mainTextureName);
+
+
+                            if (texture == null || texture.GetGUID() == Guid.Empty)
+                            {
+                                // Sample at center of white texture to avoid sampling edge colors incorrectly
+                                uvCoord.x = 0.5f;
+                                uvCoord.y = 0.5f;
+                            }
+                            else
+                            {
+                                var uvOffset = atlas.GetUV(texture.Name);
+
+
+                                uvCoord.x = Mathf.Lerp(uvOffset.xMin, uvOffset.xMax, uvCoord.x);
+                                uvCoord.y = Mathf.Lerp(uvOffset.yMin, uvOffset.yMax, uvCoord.y);
+
+                                Debug.Log(string.Format("UV_Channel : {0}, Texture : {1}, UVOffset : {2}", uvChannel, texture.Name, uvOffset));
+                            }
+
+                            uv[i] = uvCoord;
+                            updated[i] = true;
                         }
-                        else
-                        {
-                            var uvOffset = atlas.GetUV(texture.Name);
-                            
-                            uvCoord.x = Mathf.Lerp(uvOffset.xMin, uvOffset.xMax, uvCoord.x);
-                            uvCoord.y = Mathf.Lerp(uvOffset.yMin, uvOffset.yMax, uvCoord.y);
-                        }
-                        
-                        uv[i] = uvCoord;
-                        updated[i] = true;
                     }
+
                 }
                 
-            }
+                mesh.SetUVByChannel(uvChannel, uv);
 
-            mesh.uv = uv;
+            }
         }
 
 

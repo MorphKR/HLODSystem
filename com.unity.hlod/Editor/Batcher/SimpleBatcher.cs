@@ -395,11 +395,11 @@ namespace Unity.HLODSystem
                             {
                                 var uvOffset = atlas.GetUV(texture.Name);
 
+                                if (uvCoord.x == 0 && uvCoord.y == 0)
+                                    continue;
 
                                 uvCoord.x = Mathf.Lerp(uvOffset.xMin, uvOffset.xMax, uvCoord.x);
                                 uvCoord.y = Mathf.Lerp(uvOffset.yMin, uvOffset.yMax, uvCoord.y);
-
-                                Debug.Log(string.Format("UV_Channel : {0}, Texture : {1}, UVOffset : {2}", uvChannel, texture.Name, uvOffset));
                             }
 
                             uv[i] = uvCoord;

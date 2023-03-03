@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.HLODSystem.Utils;
@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Object = UnityEngine.Object;
+using MegaWorldSDK;
 
 namespace Unity.HLODSystem.Streaming
 {
@@ -22,6 +23,8 @@ namespace Unity.HLODSystem.Streaming
             public Vector3 Position;
             public Quaternion Rotation;
             public Vector3 Scale;
+
+            public List<PropCustomProperty> propertyList = new List<PropCustomProperty>();
         }
 
         [SerializeField]
@@ -90,7 +93,7 @@ namespace Unity.HLODSystem.Streaming
             }
         }
 
-        public int AddHighObject(string address, GameObject origin)
+        public int AddHighObject(string address, GameObject origin, List<PropCustomProperty> propertyList = null)
         {
             int id = m_highObjects.Count;
 
@@ -101,6 +104,7 @@ namespace Unity.HLODSystem.Streaming
             obj.Position = origin.transform.localPosition;
             obj.Rotation = origin.transform.localRotation;
             obj.Scale = origin.transform.localScale;
+            obj.propertyList = propertyList;
 
             m_highObjects.Add(obj);
             return id;
@@ -159,7 +163,7 @@ namespace Unity.HLODSystem.Streaming
                 {
                     //high object's priority is always lowest.
                     LoadInfo loadInfo = CreateLoadInfo(m_highObjects[id].Address, m_priority, distance,
-                        m_highObjects[id].Parent, m_highObjects[id].Position, m_highObjects[id].Rotation, m_highObjects[id].Scale);
+                        m_highObjects[id].Parent, m_highObjects[id].Position, m_highObjects[id].Rotation, m_highObjects[id].Scale, m_highObjects[id].propertyList);
                     m_createdHighObjects.Add(id, loadInfo);
                     
                     loadInfo.Callbacks = new List<Action<GameObject>>();
@@ -238,7 +242,7 @@ namespace Unity.HLODSystem.Streaming
 #endif
         }
         
-        private LoadInfo CreateLoadInfo(string address, int priority, float distance, Transform parent, Vector3 localPosition, Quaternion localRotation, Vector3 localScale)
+        private LoadInfo CreateLoadInfo(string address, int priority, float distance, Transform parent, Vector3 localPosition, Quaternion localRotation, Vector3 localScale, List<PropCustomProperty> propertyList = null)
         {
             LoadInfo loadInfo = new LoadInfo();
             loadInfo.Handle = AddressableLoadManager.Instance.LoadAsset(this, address, priority, distance);
@@ -254,6 +258,22 @@ namespace Unity.HLODSystem.Streaming
                 gameObject.transform.localPosition = localPosition;
                 gameObject.transform.localRotation = localRotation;
                 gameObject.transform.localScale = localScale;
+
+                if (propertyList != null)
+                {
+                    BaseProperty baseProperty = gameObject.GetComponent<BaseProperty>();
+                    Dictionary<string, string> data = new Dictionary<string, string>();
+                
+                    for (int i = 0; i < propertyList.Count; i++)
+                    {
+                        data.Add(propertyList[i].key, propertyList[i].value);
+                    }
+                
+                    if(baseProperty)
+                        baseProperty.SetMetaData(data);
+                }
+
+
                 gameObject.SetActive(false);
                 ChangeLayersRecursively(gameObject.transform, m_hlodLayerIndex);
                 loadInfo.GameObject = gameObject;

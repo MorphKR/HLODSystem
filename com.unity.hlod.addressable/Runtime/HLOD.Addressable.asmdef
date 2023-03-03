@@ -1,16 +1,19 @@
 {
     "name": "HLOD.Addressable",
+    "rootNamespace": "",
     "references": [
         "HLOD",
-      "Unity.Addressables",
-      "Unity.ResourceManager"
+        "Unity.Addressables",
+        "Unity.ResourceManager",
+        "MegaWorldSDK"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

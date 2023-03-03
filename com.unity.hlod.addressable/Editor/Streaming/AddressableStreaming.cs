@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Unity.HLODSystem.SpaceManager;
@@ -10,6 +10,7 @@ using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using Object = UnityEngine.Object;
+using MegaWorldSDK;
 
 namespace Unity.HLODSystem.Streaming
 {
@@ -227,7 +228,18 @@ namespace Unity.HLODSystem.Streaming
                     
                     if (address != null)
                     {
-                        highId = addressableController.AddHighObject(address, spaceNode.Objects[oi]);
+                        List<PropCustomProperty> propCustomPropertyList = new List<PropCustomProperty>();
+                        
+                        
+                        BaseProperty[] baseProperties = spaceNode.Objects[oi].GetComponentsInChildren<BaseProperty>();
+                        
+                        foreach(var property in baseProperties)
+                        {
+                            propCustomPropertyList.AddRange(property.GetMetaData());
+                        }
+                        
+                        highId = addressableController.AddHighObject(address, spaceNode.Objects[oi], propCustomPropertyList);
+                        //highId = addressableController.AddHighObject(address, spaceNode.Objects[oi]);
                     }
                     else
                     {
